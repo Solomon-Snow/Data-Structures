@@ -1,0 +1,72 @@
+package projectCode20280;
+
+public class ArrayStack<E> implements Stack<E>
+{
+
+	public static void main(String[] args) {
+		Object o;
+		ArrayStack<Integer> A = new ArrayStack<Integer>();
+		A.status("new ArrayStack<Integer> A", null);
+		A.push(7);
+		A.status("A.push(7)", null);
+		o = A.pop();
+		A.status("A.pop()", o);
+		A.push(9);
+		A.status("A.push(9)", null);
+		o = A.pop();
+		A.status("A.pop()", o);
+		ArrayStack<String> B = new ArrayStack<String>();
+		B.status("new ArrayStack<String> B", null);
+		B.push("Bob");
+		B.status("B.push(\"Bob\")", null);
+		B.push("Alice");
+		B.status("B.push(\"Alice\")", null);
+		o = B.pop();
+		B.status("B.pop()", o);
+		B.push("Eve");
+		B.status("B.push(\"Eve\")", null);
+
+	}
+	public void status(String op, Object element) {
+		System.out.print("------> " + op);   // print this operation
+		System.out.println(", returns " + element); // what was returned
+		System.out.print("result: size = " + size() + ", isEmpty = " + isEmpty());
+		System.out.println(", stack: " + this);       // contents of the stack
+	}
+	public static final int CAPACITY=1000; // default array capacity
+     private E[ ] data; // generic array used for storage
+	private int t = -1; // index of the top element in stack
+	public ArrayStack( ) { this(CAPACITY); } // constructs stack with default capacity
+    public ArrayStack(int capacity) { // constructs stack with given capacity
+	 data = (E[ ]) new Object[capacity]; // safe cast; compiler may give warning
+     }
+
+	@Override
+	public int size( ) { return (t + 1); }
+
+	@Override
+	public boolean isEmpty( ) { return (t == -1); }
+
+	@Override
+	public void push(E e) {
+		if (size( ) == data.length) throw new IllegalStateException("Stack is full");
+		data[++t] = e;
+	}
+	@Override
+	public E top() {
+		if (isEmpty( ))
+			return null;
+		return data[t];
+
+	}
+
+	@Override
+	public E pop() {
+		 if (isEmpty( )) return null;
+		 E answer = data[t];
+		 data[t] = null; // dereference to help garbage collection
+		 t--;
+		 return answer;
+		 }
+
+}
