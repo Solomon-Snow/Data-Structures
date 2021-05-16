@@ -1,0 +1,282 @@
+package projectCode20280;
+
+import java.util.Iterator;
+
+
+public class CircularlyLinkedList<E> implements List<E>
+{
+
+	private Node<E> tail = null; // we store tail (but not head)
+	// number of nodes in the list
+
+	private int size = 0; // number of nodes in the list
+
+	private static class Node<E>
+	{
+		private E value;
+		private Node<E> next;
+
+		int input;
+
+		public Node(E value, Node<E> next) //constructor for a Node
+		{
+			this.value = value;
+			this.next = next;
+		}
+
+		public void setNext(Node<E> next) //for setting inputted next link as "next" variable
+		{
+			this.next = next;
+		}
+
+		public Node<E> getNext() //getter to return the next node
+		{
+			return next;
+		}
+
+		public E getValue() //getter to return value of node at hand
+		{
+			return value;
+		}
+	}
+
+
+	public CircularlyLinkedList() { }
+	// constructs an initially empty list
+	// access methods
+	/**
+	 * * Returns the number of elements in the linked list.
+	 * @return the number of elements in the list
+	 * *
+	 */
+
+	@Override
+	public int size()
+	{
+		return size;
+	}
+
+	public boolean isEmpty()
+	{
+		return size == 0;
+	}
+
+	@Override
+	public E get(int i)
+	{
+		Node<E> theNode = tail;
+
+		if(!isEmpty())
+		{
+			while(theNode.input != i) //loops while the current link isn't the one we're looking for
+			{
+				if(theNode.next == null) //if the current link points to null, then it's the last in the list
+				{
+					return null; //close the loop
+				}
+				else
+				{
+					theNode = theNode.next; //if the link is null but isn't what we're looking for, move onto next link
+				}
+			}
+		}
+		else
+		{
+			System.out.println("Empty LinkedList");
+		}
+
+		return theNode.getValue(); //returns the value of the node
+	}
+
+	@Override
+	public void add(int i, E e)
+	{
+		Node<E> currentLink = tail;
+
+		Node<E> newNode = new Node<E>(e, null); //newNode will be inserted after position i
+
+		while(!currentLink.getValue().equals(i)) //loop while the value of the link doesn't equal the inputted int
+		{
+			currentLink = currentLink.next; //moves onto next link
+		}
+
+		newNode.setNext(currentLink.getNext()); //creates a new space from the next link
+		currentLink.setNext(newNode); //sets that new space as the newNode
+
+	}
+
+	@Override
+	public E removeFirst()
+	{
+		if (isEmpty())
+		{
+			return null;              // nothing to remove
+		}
+		Node<E> head = tail.getNext();
+		if (head == tail)
+		{
+			tail = null;           // must be the only node left
+		}
+		else
+		{
+			tail.setNext(head.getNext());  // removes "head" from the list
+		}
+		size--;
+
+		return head.getValue();
+	}
+
+	@Override
+	public E removeLast()
+	{
+		if(tail == null || tail.next == null)
+		{
+			return null;
+		}
+		// Find the second last node
+		Node<E> secondLast = tail;
+		while(secondLast.next.next != null)
+		{
+			secondLast = secondLast.next;
+		}
+		// change the second last node next pointer to null
+		secondLast.next = null;
+
+		return null;
+	}
+
+	@Override
+	public Iterator<E> iterator()
+	{
+		return new Iterator<E>()
+		{
+
+			Node<E> current = tail;
+
+			@Override
+			public boolean hasNext()
+			{
+				return current != null;
+			}
+
+			@Override
+			public E next()
+			{
+				if (hasNext())
+				{
+					E data = current.value;
+					current = current.next;
+					return data;
+				}
+				return null;
+			}
+
+			@Override
+			public void remove()
+			{
+				throw new UnsupportedOperationException("Remove not implemented.");
+			}
+		};
+	}
+
+	@Override
+	public void addFirst(E e)
+	{
+		if (size == 0)
+		{
+			tail = new Node<>(e, null);
+			tail.setNext(tail);                     // link to itself circularly
+		}
+		else
+		{
+			Node<E> newest = new Node<>(e, tail.getNext());
+			tail.setNext(newest);
+		}
+		size++;
+	}
+
+	@Override
+	public void addLast(E e)
+	{
+		Node<E> newest = new Node<E>(e, null); //node will be tail eventually
+		Node<E> last = tail;
+
+		if(last == null)
+		{
+			tail = newest;
+		}
+		else
+		{
+			while(last.getNext() != null) //advance to last node
+			{
+				last = last.getNext();
+			}
+			last.setNext(newest); //new node after existing tail
+		}
+		size++;
+	}
+
+	@Override
+	public E remove(int i)
+	{
+		return null;
+	}
+
+	public void rotate()				// rotate the first element to the back of the list
+	{
+		if (tail != null)
+		{
+			tail = tail.getNext();        // the old head becomes the new tail
+		}
+	}
+
+	public E first()
+	{// returns (but does not remove) the first element
+		if (isEmpty()) return null;
+		return tail.getNext().getValue();         // the head is *after* the tail
+	}
+
+	@Override
+	public String toString()
+	{
+		String result = "";
+		Node<E> current = tail;
+
+		while(current != null)
+		{
+			result += current.getValue();
+
+			if(current.getNext() != null)
+			{
+				result += ", ";
+			}
+			current = current.getNext();
+		}
+		return "[" + result+"]";
+	}
+
+	public static void main(String[] args) {
+		CircularlyLinkedList<Integer> ll = new CircularlyLinkedList<>();
+		for(int i = 10; i < 20; ++i)
+		{
+			ll.addLast(i);
+		}
+		System.out.println(ll);
+		ll.removeFirst();
+		System.out.println(ll);
+		ll.removeLast();
+		ll.rotate();
+		System.out.println(ll);
+		ll.removeFirst();
+		ll.rotate();
+		System.out.println(ll);
+		ll.removeLast();
+		ll.rotate();
+		System.out.println(ll);
+		for (Integer e : ll)
+		{
+			System.out.println("value: " + e);
+		}
+
+	}
+}
