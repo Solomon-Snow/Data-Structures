@@ -1,0 +1,304 @@
+package projectCode20280;
+
+import java.util.Iterator;
+
+
+
+public class DoublyLinkedList<E> implements List<E>
+{
+
+	private Node<E> header; //creates node header
+
+	private Node<E> trailer; //creates node trailer to be very last node in list
+
+	private int size = 0; //this will increment every-time a link is added
+
+
+	public DoublyLinkedList() //constructs new empty list
+	{
+		header = new Node<>(null, null, null); 		//creates header
+		trailer = new Node<>(null, header, null); 			//creates trailer preceded by header
+		header.setNext(trailer);										//header is followed by trailer
+	}
+
+	static class Node<E> //nested Node generic class
+	{
+		private E value;
+		private Node<E> previous;
+		private Node<E> next;
+
+		int input;
+
+		public Node(E value, Node<E> previous, Node<E> next) //constructor for a Node
+		{
+			this.value = value;
+			this.previous = previous;
+			this.next = next;
+		}
+
+		public void setNext(Node<E> next) //for setting inputted next link as "next" variable
+		{
+			this.next = next;
+		}
+
+		public Node<E> getNext() //getter to return the next node
+		{
+			return next;
+		}
+
+		public void setPrevious(Node<E> previous) //for setting inputted previous link as "previous" variable
+		{
+			this.previous = previous;
+		}
+
+		public Node<E> getPrevious() //getter to return the previous node
+		{
+			return previous;
+		}
+
+		public E getValue() //getter to return value of node at hand
+		{
+			return value;
+		}
+	} //end of nested Node class
+
+	@Override
+	public int size() //returns size of linked list
+	{
+		return size;
+	}
+
+	@Override
+	public boolean isEmpty()
+	{
+		return size == 0;
+	}
+
+
+	@Override
+	public E get(int i) //returns the element of the list with index I
+	{
+		if (i < 0 || i >= size())
+		{
+			throw new IndexOutOfBoundsException(i + " is out of the range");
+		}
+		Node<E> current = header;
+
+		for (int j = 0; j < i; j++)
+		{
+			current = current.getNext(); // advance the node each time
+		}
+		return current.getNext().getValue();
+	}
+
+	@Override
+	public void add(int i, E e)
+	{
+		if (i < 0 || i > size) {
+			throw new IllegalArgumentException("Position is Invalid");
+		}
+		/* Conditions check passed, let's insert the node */
+		if (i == 0) {
+			/* Insertion should happen at head */
+			addFirst(e);
+		} else if (i == size -1) {
+			/* Insertion should happen at tail */
+			addLast(e);
+		} else {
+			/* Insertion is happening somewhere in middle */
+			Node<E> currentNode = header;
+			for (int j = 0; j <= i; j++) {
+				currentNode = currentNode.next;
+			}
+			Node<E> previousNode = currentNode.previous;
+			/* Insertion of new node will happen in
+			 * between previous node and current node */
+			Node<E> newNode = new Node<E>(e, null, null);
+			newNode.next = currentNode;
+			newNode.previous = previousNode;
+			previousNode.next = newNode;
+			currentNode.previous = newNode;
+			size++;
+		}
+	}
+
+	/**
+	 * Removes and returns the first element of the list.
+	 * @return the removed element (or null if empty)
+	 */
+	@Override
+	public E removeFirst()
+	{
+		if(isEmpty())
+		{
+			return null;
+		}
+		Node<E> temp = header;
+		header = temp.next;
+		header.previous = null;
+		size--;
+		return header.getValue();
+	}
+
+	/**
+	 * Removes and returns the last element of the list.
+	 * @return the removed element (or null if empty)
+	 */
+	@Override
+	public E removeLast()
+	{
+		if (isEmpty()) return null;                  // nothing to remove
+		return remove(trailer.getPrevious());            // last element is before trailer
+	}
+
+	/**
+	 * Removes the given node from the list and returns its element
+	 * @param node  the node to be remobed (must not be sentinel)
+	 */
+	//@Override
+	public E remove(Node<E> node)
+	{
+		Node<E> predecessor = node.getPrevious();
+		Node<E> successor = node.getNext();
+		predecessor.setNext(successor);
+		successor.setPrevious(predecessor);
+		size--;
+		return node.getValue();
+	}
+
+	@Override
+	public Iterator<E> iterator()
+	{
+		return new Iterator<E>()
+		{
+
+			Node<E> current = header;
+
+			@Override
+			public boolean hasNext()
+			{
+				return current != null;
+			}
+
+			@Override
+			public E next()
+			{
+				if (hasNext())
+				{
+					E data = current.value;
+					current = current.next;
+					return data;
+				}
+				return null;
+			}
+
+			@Override
+			public void remove()
+			{
+				throw new UnsupportedOperationException("Remove not implemented.");
+			}
+		};
+	}
+
+	// public update methods
+	/**
+	 * * Adds an element to the front of the list.
+	 * @param e the new element to add
+	 */
+	@Override
+	public void addFirst(E e)
+	{
+		addBetween(e, header, header.getNext());    // place just after the heade
+	}
+
+
+	/**
+	 * Adds an element to the end of the list.
+	 * @param e   the new element to add
+	 */
+	@Override
+	public void addLast(E e)
+	{
+		addBetween(e, trailer.getPrevious(), trailer);
+	}
+
+	@Override
+	public E remove(int i)
+	{
+		return null;
+	}
+
+	/**
+	 * Adds an element to the linked list in between the given nodes.
+	 * The given predecessor and successor should be neighboring each
+	 * other prior to the call.
+	 *
+	 * @param predecessor   node just before the location where the new element is inserted
+	 * @param successor     node just after the location where the new element is inserted
+	 */
+	private void addBetween(E e, Node<E> predecessor, Node<E> successor) //adds element between given nodes
+	{
+		Node<E> newest = new Node<>(e, predecessor, successor);
+		predecessor.setNext(newest);
+		successor.setPrevious(newest);
+		size++;
+	}
+
+	@Override
+	public String toString()
+	{
+		StringBuilder sb = new StringBuilder("[");
+		Node<E> walk = header.getNext();
+
+		while (walk != trailer)
+		{
+			sb.append(walk.getValue());
+			walk = walk.getNext();
+
+			if (walk != trailer)
+			{
+				sb.append(", ");
+			}
+		}
+		sb.append("]");
+		return sb.toString();
+	}
+
+	/* returns (but does not remove) the last element*/
+	public E last()
+	{
+		if (isEmpty())
+		{
+			return null;
+		}
+		return trailer.getPrevious().getValue();
+	}
+
+	public E first()
+	{
+		if (isEmpty())
+		{
+			return null;
+		}
+		return header.getNext().getValue();
+	}
+
+	public static void main(String[] args)
+	{
+		DoublyLinkedList<Integer> ll = new DoublyLinkedList<>();
+		ll.addFirst(0);
+		ll.addFirst(1);
+		ll.addFirst(2);
+		ll.addLast(-1);
+		System.out.println(ll);
+
+		ll.removeFirst();
+		System.out.println(ll);
+
+		ll.removeLast();
+		System.out.println(ll);
+
+		for(Integer e: ll) {
+			System.out.println("value: " + e);
+		}
+	}
